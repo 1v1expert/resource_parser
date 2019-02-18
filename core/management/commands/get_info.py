@@ -35,4 +35,5 @@ class Command(BaseCommand):
 				car.details = ';'.join([unicodedata.normalize("NFKD", word) for word in item.get('details')])[:750]
 				car.attr = str(item.get('attr'))[:750]
 				car.save()
-		
+				
+				
