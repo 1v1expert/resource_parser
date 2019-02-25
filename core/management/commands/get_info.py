@@ -21,19 +21,27 @@ class Command(BaseCommand):
 		if 'message' in locals():
 			items = message.get('items')
 			for item in items:
-				car = Cars()
-				car.idd = item.get('id')
-				car.url = item.get('url')[:250]
-				car.category = item.get('category')
-				car.hasDamage = item.get('hasDamage')
-				car.price = unicodedata.normalize("NFKD", item.get('price').get('grs').get('localized'))
-				car.title = item.get('title')
-				car.created = item.get('created')
-				car.modified = item.get('modified')
-				car.renewed = item.get('renewed')
-				car.features = ';'.join([unicodedata.normalize("NFKD", word) for word in item.get('features')])[:750]
-				car.details = ';'.join([unicodedata.normalize("NFKD", word) for word in item.get('details')])[:750]
-				car.attr = str(item.get('attr'))[:750]
-				car.save()
+				id = item.get('id')
+				try:
+					car = Cars.objects.get(idd=id)
+				except Cars.DoesNotExist:
+					n_car = Cars()
+					n_car.idd = item.get('id')
+					n_car.url = item.get('url')[:250]
+					n_car.category = item.get('category')
+					n_car.hasDamage = item.get('hasDamage')
+					n_car.price = unicodedata.normalize("NFKD", item.get('price').get('grs').get('localized'))
+					n_car.title = item.get('title')
+					n_car.created = item.get('created')
+					n_car.modified = item.get('modified')
+					n_car.renewed = item.get('renewed')
+					n_car.features = ';'.join([unicodedata.normalize("NFKD", word) for word in item.get('features')])[
+					                 :750]
+					n_car.details = ';'.join([unicodedata.normalize("NFKD", word) for word in item.get('details')])[
+					                :750]
+					n_car.attr = str(item.get('attr'))[:750]
+					n_car.save()
+				
+
 				
 				

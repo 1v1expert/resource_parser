@@ -16,7 +16,7 @@ def get_url(mileage_from=None, mileage_to=None):
 
 def make_api_request(request_method='get', params=None,
                      data=None, **kwargs):
-    request_method = getattr(requests, request_method)
+    requests_method = getattr(requests, request_method)
     api_url = get_url(5000, 125000)
     if kwargs:
         for value in kwargs.values():
@@ -25,7 +25,7 @@ def make_api_request(request_method='get', params=None,
                              'Chrome/39.0.2171.95 Safari/537.36',
                'accept-language': 'ru,en-US;q=0.9,en;q=0.8',
                'cache-control': 'no-cache'}
-    return request_method(api_url, params=params, headers=headers, data=data)
+    return requests_method(api_url, params=params, headers=headers, data=data)
     # if return_json and response.status_code in (200, 201):
     #     try:
     #         return response.json()
