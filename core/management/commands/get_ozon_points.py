@@ -19,8 +19,7 @@ area_list = [{"areaId":45,"name":"Жуковский","city":"Жуковский
 def save_data(data):
 	#OzonPoints.objects.all().delete()
 	for i in data:
-		print(data)
-		
+
 		point, create = OzonPoints.objects.get_or_create(idd=i.get('id'),
 		                                 defaults={
 			                                 "name": i.get('name')[:250],
@@ -102,7 +101,7 @@ class Command(BaseCommand):
 	
 	def handle(self, *args, **options):
 		OzonPoints.objects.all().delete()
-		token = input('Entered token: ')
+		token = 'cWwN7QB86Ei9ExsJD8cx'
 		for area in area_list:
 			get_data(area.get('areaId', None), token)
 		get_data(2, token)
