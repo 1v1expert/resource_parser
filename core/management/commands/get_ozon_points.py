@@ -57,18 +57,26 @@ def get_data(areaId=2, token='cWwN7QB86Ei9ExsJD8cx'):
 	           'splitGroups': [{'key': 'FBO', 'splits': [{'key': 'FBO-1-W3'}]}]}
 	get_request = requests_method(url, headers=headers, json=request)
 	if get_request.status_code in (200, 201):
-		#message = get_request.json()
-		#save_data(message.get('data')['delivery']['deliveryTypes'][0]['deliveryMethods'])
+		message = get_request.json()
+		flag = True
 		try:
-			message = get_request.json()
-			#print(message.get('data')['delivery']['deliveryTypes'][0]['deliveryMethods'])
-			save_data(message.get('data')['delivery']['deliveryTypes'][0]['deliveryMethods'])
-		except JSONDecodeError:
-			print(get_request.text)
-			return get_request.text
+			data = message.get('data')['delivery']['deliveryTypes'][0]
 		except:
-			print(message.get('data')['delivery']['deliveryTypes'])
-			return get_request.text  # return get_request.text
+			flag = False
+			print('no data')
+			
+		if flag:
+			save_data(data['deliveryMethods'])
+		# try:
+		# 	message = get_request.json()
+		# 	#print(message.get('data')['delivery']['deliveryTypes'][0]['deliveryMethods'])
+		# 	save_data(message.get('data')['delivery']['deliveryTypes'][0]['deliveryMethods'])
+		# except JSONDecodeError:
+		# 	print(get_request.text)
+		# 	return get_request.text
+		# except:
+		# 	print(message.get('data')['delivery']['deliveryTypes'])
+		# 	return get_request.text  # return get_request.text
 	else:
 		return get_request.text
 	
