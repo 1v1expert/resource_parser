@@ -16,6 +16,7 @@ class Cars(models.Model):
     url = models.CharField(max_length=250, default="", verbose_name="url")
 
 class OzonPoints(models.Model):
+    idd = models.IntegerField(null=True, verbose_name='Id')
     name = models.CharField(max_length=250, verbose_name='name')
     address = models.CharField(max_length=250, verbose_name='address')
     deliveryType = models.CharField(max_length=250, verbose_name='deliveryType')
