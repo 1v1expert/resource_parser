@@ -6,6 +6,7 @@ from core.client import make_api_request
 from json.decoder import JSONDecodeError
 from core.models import Cars, OzonPoints
 import requests
+import json
 
 import unicodedata
 
@@ -18,17 +19,18 @@ area_list = [{"areaId":45,"name":"Жуковский","city":"Жуковский
 def save_data(data):
 	#OzonPoints.objects.all().delete()
 	for i in data:
+		print(data)
 		
 		point, create = OzonPoints.objects.get_or_create(idd=i.get('id'),
 		                                 defaults={
 			                                 "name": i.get('name')[:250],
 			                                 "address": i.get('address')[:250],
-			                                 "deliveryType": i.get('deliveryType').get('name')[:250]
+			                                 #"deliveryType": i.get('deliveryType').get('name')[:250]
 		                                 })
 		#print(point, create)
 		if create:
 			try:
-				point.metro = i.get('metro')[0].get('name')[:250]
+				point.metro = i.get('metro')[:250]
 				point.save()
 			except:
 				print('Error create metro')
@@ -37,6 +39,7 @@ def save_data(data):
 
 def get_data(areaId=2, token='cWwN7QB86Ei9ExsJD8cx'):
 	url = 'https://api.ozon.ru/checkout/v7/checkout'
+	url2 = 'https://www.ozon.ru/json/pvzservice.asmx/getbyareaid'
 	requests_method = getattr(requests, 'post')
 	headers = {'authorization': 'Bearer {}'.format(token),  # 'Origin': 'https://www.ozon.ru',
 		'Content-Type': 'application/json',
@@ -45,6 +48,7 @@ def get_data(areaId=2, token='cWwN7QB86Ei9ExsJD8cx'):
 	# 'x-o3-app-handler':'Checkout/Checkout',
 	# 'x-o3-app-name': 'ozon_new',
 	# 'X-OZON-ABGROUP': '44'}
+	request2 = {"areaId": areaId}
 	request = {'areaId': areaId, 'balanceAmount': 0, 'deliveryTypeId': 2, 'filters': {
 		'itemFields': ['info', 'quantity', 'seller', 'price', 'availability', 'merchant', 'feedback',
 		               'isDeliveryUnavailableItem'],
@@ -55,18 +59,20 @@ def get_data(areaId=2, token='cWwN7QB86Ei9ExsJD8cx'):
 	           'options': {'legalUser': False, 'rewriteStorage': False, 'useStorage': True}, 'pointsAmount': 0,
 	           'scope': ['delivery', 'deliveryMethods', 'deliveryInfo', 'payment'],
 	           'splitGroups': [{'key': 'FBO', 'splits': [{'key': 'FBO-1-W3'}]}]}
-	get_request = requests_method(url, headers=headers, json=request)
+	get_request = requests_method(url2, headers=headers, json=request2)
 	if get_request.status_code in (200, 201):
 		message = get_request.json()
 		flag = True
 		try:
-			data = message.get('data')['delivery']['deliveryTypes'][0]
+			data = json.loads(message.get('d', None).get('data'))
+			print(data)#, message)
+			#data = message.get('data')['delivery']['deliveryTypes'][0]
 		except:
 			flag = False
 			print('no data')
 			
 		if flag:
-			save_data(data['deliveryMethods'])
+			save_data(data)
 		# try:
 		# 	message = get_request.json()
 		# 	#print(message.get('data')['delivery']['deliveryTypes'][0]['deliveryMethods'])
