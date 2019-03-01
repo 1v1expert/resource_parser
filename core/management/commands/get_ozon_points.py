@@ -4,16 +4,11 @@ from django.core.management.base import BaseCommand
 from django.conf import settings
 from core.client import make_api_request
 from json.decoder import JSONDecodeError
-from core.models import Cars, OzonPoints
+from core.models import Cars, OzonPoints, AreaList
 import requests
 import json
 
 import unicodedata
-
-# Московская обалсть:
-
-area_list = [2, 45, 69920, 120, 170, 708, 60, 188, 617, 543, 463, 642, 147, 44, 427, 615, 517, 449, 698, 79, 787, 263, 317, 230, 4, 232, 190, 367, 15]
-
 
 def save_data(data):
 	#OzonPoints.objects.all().delete()
@@ -99,7 +94,10 @@ class Command(BaseCommand):
 	help = 'Generates Fake data'
 	
 	def handle(self, *args, **options):
-		#OzonPoints.objects.all().delete()
 		token = 'cWwN7QB86Ei9ExsJD8cx'
+		try:
+			area_list = AreaList.objects.all()
+		except:
+			from core.data import area_list
 		for area in area_list:
-			get_data(area, token)
+			get_data(area.idd, token)

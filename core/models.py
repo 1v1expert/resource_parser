@@ -21,3 +21,7 @@ class OzonPoints(models.Model):
     address = models.CharField(max_length=250, verbose_name='address')
     deliveryType = models.CharField(max_length=250, verbose_name='deliveryType')
     metro = models.CharField(max_length=250, verbose_name='metro')
+    
+class AreaList(models.Model):
+	idd = models.IntegerField(verbose_name='idd')
+	city = models.CharField(max_length=250, verbose_name='city')
