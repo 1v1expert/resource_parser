@@ -99,7 +99,7 @@ class Command(BaseCommand):
 	help = 'Generates Fake data'
 	
 	def handle(self, *args, **options):
-		OzonPoints.objects.all().delete()
+		#OzonPoints.objects.all().delete()
 		token = 'cWwN7QB86Ei9ExsJD8cx'
 		for area in area_list:
 			get_data(area, token)
