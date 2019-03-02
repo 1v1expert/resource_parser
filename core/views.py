@@ -26,12 +26,11 @@ def render_page_points(request):
 
 	return HttpResponse(template.render({'Points': points}, request))
 
+
 def update_list_points(request):
 	import transliterate
-	print()
 	
-	response = {}
-	update_list = []
+	update_list, response = [], {}
 	areaId, city = request.GET.get('areaId', None), request.GET.get('city', None)
 	if request.method == 'GET' and areaId and city:
 		obj, created = AreaList.objects.update_or_create(idd=areaId, defaults={"city": city})
@@ -40,6 +39,7 @@ def update_list_points(request):
 		else:
 			response.update({"Successfully update point number: ": areaId})
 	area_list = AreaList.objects.all()
+	OzonPoints.objects.all().delete()
 	for area in area_list:
 		data = get_ozon_points(area.idd)
 		if isinstance(data, list):
