@@ -1,7 +1,9 @@
 from django.shortcuts import render
 from django.template import loader
 from django.http import HttpResponse, JsonResponse
-from core.models import Cars, OzonPoints
+from core.models import Cars, OzonPoints, AreaList
+
+from core.management.commands.get_ozon_points import get_ozon_points
 
 
 def render_page(request):
@@ -10,17 +12,41 @@ def render_page(request):
 	return HttpResponse(template.render(context, request))
 
 def render_page_points(request):
-	areaId = request.GET.get('areaId', default=None)
-	method = request.GET.get('areaId', default=None)
-	if request.method == 'GET' and areaId:
-		#OzonPoints.objects.get_or_create
-		print(vars(request), request.GET)
+	params = {}
+	if request.method == 'GET' and len(request.GET):
+		params = {'{}__icontains'.format(k): v for k, v in request.GET.items()}
 	template = loader.get_template('points.html')
-	part1 = OzonPoints.objects.all()[0:999]
-	part2 = OzonPoints.objects.all()[999:1998]
-	payt_list = list()
-	payt_list += list(part1)
-	payt_list += list(part2)
+	points = OzonPoints.objects.filter(**params)
 
-	context = {'Points': payt_list}
-	return HttpResponse(template.render(context, request))
+	# part1 = OzonPoints.objects.all()[0:999]
+	# part2 = OzonPoints.objects.all()[999:1998]
+	# payt_list = list()
+	# payt_list += list(part1)
+	# payt_list += list(part2)
+
+	return HttpResponse(template.render({'Points': points}, request))
+
+def update_list_points(request):
+	import transliterate
+	print()
+	
+	response = {}
+	update_list = []
+	areaId, city = request.GET.get('areaId', None), request.GET.get('city', None)
+	if request.method == 'GET' and areaId and city:
+		obj, created = AreaList.objects.update_or_create(idd=areaId, defaults={"city": city})
+		if created:
+			response.update({"Successfully added point number: ": areaId})
+		else:
+			response.update({"Successfully update point number: ": areaId})
+	area_list = AreaList.objects.all()
+	for area in area_list:
+		data = get_ozon_points(area.idd)
+		if isinstance(data, list):
+			stat_data = OzonPoints.update_points(data)
+			stat_data.update({'city': transliterate.translit(area.city, reversed=True) if area.city != '' else ''})
+			update_list.append(stat_data)
+		else:
+			update_list.append(data)
+	response.update({'Successfully update points': update_list})
+	return JsonResponse(response, safe=False)

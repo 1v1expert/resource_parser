@@ -10,17 +10,15 @@ import json
 
 import unicodedata
 
-def save_data(data):
+def update_points(data):
 	#OzonPoints.objects.all().delete()
 	for i in data:
 
 		point, create = OzonPoints.objects.get_or_create(idd=i.get('id'),
 		                                 defaults={
 			                                 "name": i.get('name')[:250],
-			                                 "address": i.get('address')[:250],
-			                                 #"deliveryType": i.get('deliveryType').get('name')[:250]
+			                                 "address": i.get('address')[:250]
 		                                 })
-		#print(point, create)
 		if create:
 			try:
 				point.metro = i.get('metro')[:250]
@@ -29,7 +27,22 @@ def save_data(data):
 				print('Error create metro')
 				
 
-
+def get_ozon_points(areaId):
+	url = 'https://www.ozon.ru/json/pvzservice.asmx/getbyareaid'
+	requests_method = getattr(requests, 'post')
+	headers = {'Content-Type': 'application/json',
+	           'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) '
+	                         'Chrome/39.0.2171.95 Safari/537.36'}
+	request = requests_method(url, headers=headers, json={"areaId": areaId})
+	if request.status_code in (200, 201):
+		try:
+			return json.loads(request.json().get('d', None).get('data'))
+		except Exception as e:
+			return 'Error get data, exception: {}'.format(e)
+	return 'no data, response text: {}'.format(request.text)
+	
+	
+	
 def get_data(areaId=2, token='cWwN7QB86Ei9ExsJD8cx'):
 	url = 'https://api.ozon.ru/checkout/v7/checkout'
 	url2 = 'https://www.ozon.ru/json/pvzservice.asmx/getbyareaid'
@@ -42,16 +55,6 @@ def get_data(areaId=2, token='cWwN7QB86Ei9ExsJD8cx'):
 	# 'x-o3-app-name': 'ozon_new',
 	# 'X-OZON-ABGROUP': '44'}
 	request2 = {"areaId": areaId}
-	request = {'areaId': areaId, 'balanceAmount': 0, 'deliveryTypeId': 2, 'filters': {
-		'itemFields': ['info', 'quantity', 'seller', 'price', 'availability', 'merchant', 'feedback',
-		               'isDeliveryUnavailableItem'],
-		'deliveryFields': ['id', 'name', 'coordinates', 'address', 'deliveryType', 'metro', 'provider', 'deliveryPrice',
-		                   'deliveryDiscountedPrice', 'useInLastOrders', 'hasLoyalty', 'restrictionAccessField',
-		                   'storagePeriod', 'properties', 'classInstanceDescription', 'foreignCustomFeesMessage',
-		                   'splits', 'timeSlotsAvailable']}, 'items': [{'id': 148296533, 'quantity': 1}],
-	           'options': {'legalUser': False, 'rewriteStorage': False, 'useStorage': True}, 'pointsAmount': 0,
-	           'scope': ['delivery', 'deliveryMethods', 'deliveryInfo', 'payment'],
-	           'splitGroups': [{'key': 'FBO', 'splits': [{'key': 'FBO-1-W3'}]}]}
 	get_request = requests_method(url2, headers=headers, json=request2)
 	if get_request.status_code in (200, 201):
 		message = get_request.json()
@@ -65,7 +68,7 @@ def get_data(areaId=2, token='cWwN7QB86Ei9ExsJD8cx'):
 			print('no data')
 			
 		if flag:
-			save_data(data)
+			update_points(data)
 		# try:
 		# 	message = get_request.json()
 		# 	#print(message.get('data')['delivery']['deliveryTypes'][0]['deliveryMethods'])
@@ -95,9 +98,6 @@ class Command(BaseCommand):
 	
 	def handle(self, *args, **options):
 		token = 'cWwN7QB86Ei9ExsJD8cx'
-		try:
-			area_list = AreaList.objects.all()
-		except:
-			from core.data import area_list
-		for area in area_list:
-			get_data(area.idd, token)
+		# area_list = AreaList.objects.all()
+		# for area in area_list:
+		# 	get_data(area.idd, token)
