@@ -9,4 +9,4 @@ area_list = [{'areaId': 45, 'city': 'Жуковский'}, {'areaId': 69920, 'ci
              {'areaId': 79, 'city': 'Коломна'}, {'areaId': 2, 'city': 'Москва'}, {'areaId': 787, 'city': ''},
              {'areaId': 263, 'city': ''}, {'areaId': 317, 'city': ''}, {'areaId': 230, 'city': ''},
              {'areaId': 4, 'city': ''}, {'areaId': 232, 'city': ''}, {'areaId': 190, 'city': ''},
-             {'areaId': 367, 'city': ''}, {'areaId': 15, 'city': ''}]
+             {'areaId': 367, 'city': ''}, {'areaId': 15, 'city': ''}, {'areaId': 5911, 'city': 'Санкт-Петербург'}]

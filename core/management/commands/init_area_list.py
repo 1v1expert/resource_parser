@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 
-from core.models import  AreaList
+from core.models import AreaList
 from core.data import area_list
 
 class Command(BaseCommand):
